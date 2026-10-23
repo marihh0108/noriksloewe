@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#087c83">
+  <title>Alles Gute, Norik! 🦁</title>
+  <style>
+    :root { color-scheme: light; --teal:#087c83; --ink:#284e54; --gold:#ffc655; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100svh; padding:clamp(20px,5vw,48px) 16px; background:#fff8ea; color:var(--ink); font-family:ui-rounded, 'Trebuchet MS', system-ui, sans-serif; text-align:center; }
+    main { max-width:980px; margin:auto; }
+    .badge { display:inline-grid; place-items:center; width:58px; height:58px; border-radius:50%; background:var(--gold); color:#775012; font-size:32px; font-weight:900; transform:rotate(-9deg); box-shadow:0 5px 0 #e7ab37; }
+    h1 { font-size:clamp(30px,6vw,55px); line-height:1.12; letter-spacing:-1.5px; margin:20px 0 10px; color:var(--teal); }
+    .intro { font-size:clamp(16px,2.8vw,21px); margin:0 0 26px; }
+    .player { position:relative; overflow:hidden; background:#112325; border-radius:22px; border:5px solid white; box-shadow:0 12px 40px #73591624; aspect-ratio:16/9; }
+    video { display:block; width:100%; height:100%; object-fit:contain; background:#112325; }
+    .start { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; background:linear-gradient(transparent 25%,#15232233); }
+    .play { border:4px solid white; background:var(--teal); color:white; width:94px; height:94px; border-radius:50%; cursor:pointer; display:grid; place-items:center; box-shadow:0 5px 25px #0005; transition:transform .2s; }
+    .play:hover { transform:scale(1.07); }
+    .play svg { width:38px; height:38px; margin-left:5px; fill:currentColor; }
+    button:focus-visible,a:focus-visible { outline:4px solid #ed9d12; outline-offset:5px; }
+    [hidden] { display:none!important; }
+    .actions { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin:20px 0 12px; }
+    .action { border:1px solid #087c833b; border-radius:99px; padding:12px 20px; font:inherit; font-weight:700; color:var(--teal); background:white; cursor:pointer; text-decoration:none; }
+    .hint { min-height:22px; font-size:14px; line-height:1.5; margin:10px 0; }
+    footer { margin-top:26px; font-size:18px; font-weight:700; }
+    .star { color:#e2a229; }
+    .player:fullscreen { border:0; border-radius:0; width:100vw; height:100vh; background:black; }
+    .player:fullscreen video { object-fit:contain; }
+    @media(max-width:480px) { .player { border-width:3px; border-radius:15px; } .play { width:72px; height:72px; } h1{letter-spacing:-.7px;} }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="badge" aria-label="Sechs Jahre">6</div>
+    <h1>Alles Gute, Norik!</h1>
+    <p class="intro">Dein Geburtstagslöwe hat dir etwas zu sagen. 🦁</p>
+    <div class="player" id="player">
+      <video id="video" controls playsinline preload="metadata" poster="loewe.png" aria-label="Geburtstagsgruß für Norik">
+        <source src="geburtstag.mp4" type="video/mp4">
+        Dein Browser kann dieses Video nicht abspielen. <a href="geburtstag.mp4">Video direkt öffnen</a>.
+      </video>
+      <div class="start" id="start">
+        <button class="play" id="play" type="button" aria-label="Geburtstagsvideo mit Ton abspielen">
+          <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M9 4 L35 20 L9 36 Z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="action" id="fullscreen" type="button">⛶ Groß anschauen</button>
+      <button class="action" id="replay" type="button" hidden>↻ Noch einmal!</button>
+    </div>
+    <p class="hint" id="hint" role="status">Tippe auf Play und schalte den Ton ein.</p>
+    <a class="action" id="fallback" href="geburtstag.mp4" hidden>Video direkt öffnen</a>
+    <footer>Alles Liebe von Marina <span class="star">♥</span></footer>
+  </main>
+  <script>
+    const video=document.getElementById('video');
+    const player=document.getElementById('player');
+    const start=document.getElementById('start');
+    const hint=document.getElementById('hint');
+    const replay=document.getElementById('replay');
+    const fallback=document.getElementById('fallback');
+    function fullscreen() {
+      try {
+        if(video.webkitEnterFullscreen) { video.webkitEnterFullscreen(); return; }
+        if(player.requestFullscreen) {
+          player.requestFullscreen().catch(()=>{hint.textContent='Nutze das Vollbildsymbol im Video oder drehe dein Handy quer.';});
+        } else { hint.textContent='Nutze das Vollbildsymbol im Video oder drehe dein Handy quer.'; }
+      } catch(error) { hint.textContent='Nutze das Vollbildsymbol im Video oder drehe dein Handy quer.'; }
+    }
+    function play() {
+      video.muted=false;
+      const result=video.play();
+      if(result) result.catch(()=>{start.hidden=false;hint.textContent='Tippe noch einmal auf Play, um das Video zu starten.';});
+    }
+    document.getElementById('play').addEventListener('click',()=>{play();fullscreen();});
+    document.getElementById('fullscreen').addEventListener('click',()=>{play();fullscreen();});
+    replay.addEventListener('click',()=>{video.currentTime=0;play();});
+    video.addEventListener('playing',()=>{start.hidden=true;hint.textContent='Viel Spaß, Norik!';replay.hidden=true;});
+    video.addEventListener('ended',()=>{replay.hidden=false;hint.textContent='Noch einmal anschauen?';});
+    video.addEventListener('error',()=>{start.hidden=true;fallback.hidden=false;hint.textContent='Das Video konnte hier nicht geladen werden. Öffne es direkt über den Knopf darunter.';});
+  </script>
+</body>
+</html>
